@@ -44,6 +44,7 @@ h2{font-size:21px;margin:0 0 4px}.sub{color:var(--mute);margin:0 0 14px;font-siz
 .day h3{margin:0 0 4px;font-size:16px}.day ul{margin:6px 0 0;padding-left:18px}.day li{margin:2px 0}
 .day .note{font-size:13px;color:var(--mute)}
 .day.hl .dd{background:var(--blue)}
+.flight{background:#EEF4FB;border-left:3px solid var(--blue);border-radius:6px;padding:5px 10px;margin:8px 0 2px;font-size:14px;font-weight:600}
 .tbl{width:100%;border-collapse:collapse;font-size:14px}
 .tbl th,.tbl td{padding:8px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
 .tbl th{font-size:12px;color:var(--mute);font-weight:600}.num{text-align:right;white-space:nowrap}
@@ -76,11 +77,11 @@ footer{max-width:960px;margin:0 auto;padding:10px 20px 40px;color:var(--mute);fo
   <p class="sub" style="margin-bottom:8px">點標記可開啟 Google 地圖；位置為概略標點。</p>
   <div class="chips" id="regionChips"></div>
   <div id="map"></div>
-  <p class="sum" style="margin-top:14px">16 天、四人同行。札幌／手稻／Kiroro 滑雪，12/31 轉往越後湯澤，1/1 教練課、1/2 石打丸山日夜滑，最後回東京返台。</p>
+  <p class="sum" style="margin-top:14px">16 天。12/22–12/29 札幌段為個人行程（札幌／手稻／Kiroro）；12/31 起與朋友轉往越後湯澤，1/1 教練課、1/2 石打丸山日夜滑，最後回東京返台。</p>
   <div class="facts">
     <div class="fact"><b>16 天</b><span>12/22（二）– 1/6（三）</span></div>
     <div class="fact"><b>6 個滑雪日</b><span>若 1/5 輕井澤成行則為 7</span></div>
-    <div class="fact"><b>4 人</b><span>湯澤住宿、教練課、雪票均分</span></div>
+    <div class="fact"><b>12/31 起 4 人</b><span>湯澤住宿、教練課、雪票均分</span></div>
   </div>
 </section>
 
@@ -155,14 +156,14 @@ const REG={all:'全部',hk:'北海道',tk:'東京',nj:'新潟',nr:'長野（備�
 
 /* 每日 */
 const DAYS=[
- {d:'12/22',w:'二',ph:'第一階段｜北海道',t:'台灣 → 札幌',st:['ok'],p:['sap'],li:['抵達、移動、入住'],n:'交通已訂；公開頁不列航班與住宿細節'},
+ {d:'12/22',w:'二',ph:'第一階段｜北海道（個人行程）',t:'台灣 → 札幌',st:['ok'],p:['sap'],fl:['桃園 T1 09:20 起飛 → 新千歲 14:05 抵達（日本時間，比台灣快 1 小時）'],li:['建議 06:30 前抵達桃園 T1（雪板托運）','預估 15:00–15:30 出關（領雪板特殊行李可能較慢），搭 JR 快速 Airport 約 40 分鐘進札幌','預估 16:30–17:00 入住 JR 札幌站附近飯店'],n:'交通已訂；以上為預估時間，請以實際入境與班次為準'},
  {d:'12/23',w:'三',t:'札幌：雪具店與市區',st:['tmp'],p:['sap'],li:['雪具店確認安全帽、護具、上蠟','大通、狸小路等市區觀光'],n:'市區細節可彈性調整'},
  {d:'12/24',w:'四',t:'札幌國際滑雪場：全天自由滑',st:['no'],p:['kok'],hl:1,li:['計畫搭巴士＋雪票套票（約 ¥9,500）'],n:'雪票與接駁未購；需核對日期、上下車點與空位'},
  {d:'12/25',w:'五',t:'手稻 Olympia：私人課',st:['ok','no'],p:['tei'],hl:1,li:['09:00「雪長姐」單人全天私人課（NT$16,000 已付）','建議 08:15–08:30 抵達；需確認教練集合點','雪票與早班交通未購（考慮 JR 到手稻站再轉計程車）'],n:'Big Runs 約 09:25 才到，趕不上 09:00 課程'},
  {d:'12/26',w:'六',t:'手稻 Olympia：自由滑',st:['no'],p:['tei'],hl:1,li:['計畫 Big Runs 巴士＋7 小時票（¥11,000）','暫定 MYSTAYS Sapporo Aspen 08:10 上車、約 09:25 抵達、16:10 回程'],n:'希望 12/16 日本時間 18:00 前預約；須訂位確認'},
  {d:'12/27',w:'日',t:'小樽觀光與休息',st:['tmp'],p:['ota'],li:['滑雪後的緩衝日'],n:'暫定'},
  {d:'12/28',w:'一',t:'Kiroro Snow World',st:['no'],p:['kir'],hl:1,li:['札幌往返巴士＋6 小時雪票（¥9,800）'],n:'需核對有位與合適的札幌上車點'},
- {d:'12/29',w:'二',ph:'第二階段｜東京',t:'札幌 → 東京',st:['ok'],p:['tok'],li:['入住赤羽雙人房（12/29–12/31，已確認、免費取消）','東京市區'],n:'城市間交通已訂；航班細節不公開'},
+ {d:'12/29',w:'二',ph:'第二階段｜東京',t:'札幌 → 東京',st:['ok'],p:['tok'],fl:['新千歲國內線 11:30 起飛 → 羽田 T2 13:10 抵達'],li:['建議 09:30 前抵達新千歲（雪板托運），札幌站約 08:30 出發（預估）','預估 14:30–15:00 入住赤羽雙人房（12/29–12/31，已確認、免費取消）','東京市區'],n:'交通已訂；以上為預估時間'},
  {d:'12/30',w:'三',t:'東京自由行／購物／休息',st:['tbd'],p:['tok'],li:['整理隔日進湯澤的行李'],n:'景點未定'},
  {d:'12/31',w:'四',ph:'第三階段｜新潟',t:'赤羽 → 大宮 → 越後湯澤',st:['no'],p:['tok','oms','yuz'],li:['上越新幹線前往四人住宿'],n:'JR 指定席尚未購買（原則 12/1 台灣時間 09:00 開賣）；住宿尾款未付'},
  {d:'1/1',w:'五',t:'UNI SNOW 一對四教練課',st:['ok','un'],p:['yuz'],hl:1,li:['預約成功、教練已保留，費用 ¥95,000（每人 ¥23,750）','雪場、集合地點與交通待教練於出發前約一個月通知'],n:'教練費未匯款；雪票先不要買，等教練確認'},
@@ -170,7 +171,7 @@ const DAYS=[
  {d:'1/3',w:'日',ph:'第四階段｜東京＋長野備案',t:'越後湯澤 → 大宮 → 赤羽',st:['no'],p:['yuz','oms','tok'],li:['新幹線未買（原則 12/3 台灣時間 09:00 開賣）','入住赤羽雙人房（1/3–1/5，已確認、免費取消）'],n:'是否搭配 1/5 輕井澤會影響周遊券選擇'},
  {d:'1/4',w:'一',t:'東京自由行／休息',st:['tbd'],p:['tok'],li:['未排固定活動','續住赤羽雙人房']},
  {d:'1/5',w:'二',t:'可能：輕井澤王子飯店滑雪場',st:['tbd'],p:['kar'],li:['東京經大宮新幹線當日往返','原則 12/5 起可訂當日指定席','飛下午搭機返台；你當晚改住赤羽單人房（1/5–1/6，已確認、免費取消）'],n:'尚未決定，目前不是已訂行程；飛下午搭機，若成行只有你一人，且需顧及飛前往機場的時間'},
- {d:'1/6',w:'三',t:'東京 → 台灣（你）',st:['ok'],p:['tok'],li:['赤羽退房（單人房）','返程交通已訂；票務與機場細節僅存私人文件']}
+ {d:'1/6',w:'三',t:'東京 → 台灣（你）',st:['ok'],p:['tok'],fl:['成田 T2 15:40 起飛 → 桃園 T1 18:45 抵達（台灣時間）'],li:['建議 12:30–13:00 前抵達成田（雪板托運）','赤羽約 10:30 前出發（預估 1.5–2 小時車程，請出發前查證實際交通）','赤羽單人房退房'],n:'返程交通已訂；注意是從成田（NRT）起飛，不是羽田'}
 ];
 
 /* 票券 */
@@ -178,8 +179,8 @@ const TK=[
  ['12/24','札幌國際：Access 巴士＋一日票','約 ¥9,500','no','https://www.access-n.jp/winter2026/lift/detail/kokusai_lift_ss.html','核對日期、上下車點、空位與取消規定'],
  ['12/24 備案','中央巴士／じょうてつ巴士＋一日票','約 ¥9,800','no','https://teikan.chuo-bus.co.jp/course/16756','可能另有 IC 卡押金'],
  ['12/25','手稻 Olympia 單日雪票','約 ¥8,800','no','https://teine.axess.shop/zh-TW/Products/Tickets/','確認一般日票是否已上架'],
- ['12/25','札幌 → 手稻 早班交通','依實際搭乘','no','https://sapporo-teine.com/snow/access','考慮 JR 到手稻站再轉計程車'],
- ['12/26','Big Runs 巴士＋7 小時票','¥11,000','no','https://bigruns-jp.revn.jp/','建議 12/16 前預約'],
+ ['12/25','札幌 → 手稻 早班交通','依實際搭乘','no','https://sapporo-teine.com/snow/access','2026–27 JR 巴士時刻官網仍標「準備中」；可 JR 到手稻站再轉計程車（官網估約 ¥3,000，非保證價）'],
+ ['12/26','Big Runs 巴士＋7 小時票','¥11,000','no','https://bigruns-jp.revn.jp/','建議 12/16 前預約；全天滑比自搭 JR＋公車（往返約 ¥2,720）省約 ¥520；只滑 5 小時自助約 ¥9,320'],
  ['12/28','Kiroro：Access 巴士＋6 小時票','¥9,800','no','https://www.access-n.jp/winter2026/lift/detail/kiroro_lift_ss.html','核對有位與上車點'],
  ['12/31','東京 → 越後湯澤 新幹線','待訂票','no','https://www.eki-net.com/','12/1 台灣時間 09:00 開賣'],
  ['1/1','UNI SNOW 雪場雪票與交通','未知','tbd','','先不要買，待教練通知'],
@@ -218,7 +219,7 @@ const CK=[
  ['裝備／出發前行政',[
   ['g1','雪地安全帽（Oakley MOD3 已試戴舒適，尚未購買）'],
   ['g2','檢查護臀、護膝、護腕、手套與專用雪板袋'],
-  ['g3','雪板特殊行李申報：填實際秤重與尺寸，向航空公司確認回覆'],
+  ['g3','雪板特殊行李：去程、札幌→東京、返程三段都要向航空公司申報並確認；以實際打包量測的尺寸與重量填寫'],
   ['g4','海外旅遊與滑雪保險：醫療、救援、滑雪運動、第三人責任'],
   ['g5','Visit Japan Web、eSIM／漫遊、旅遊文件與離線備份'],
   ['g6','確認湯澤住宿的雪板存放、進出方式、1/3 前往車站接駁']]]
@@ -231,7 +232,7 @@ function renderDays(){
   if(x.ph)h+=`<div class="phase">${x.ph}</div>`;
   const links=x.p.map(k=>`<a href="${gm(PLACES[k].q)}" target="_blank" rel="noopener">📍${PLACES[k].n}</a>`).join('　');
   h+=`<div class="day${x.hl?' hl':''}"><div class="dd"><b>${x.d}</b><span>週${x.w}</span></div>
-  <div class="card"><h3>${x.t}</h3><div>${x.st.map(badge).join('')}</div>
+  <div class="card"><h3>${x.t}</h3><div>${x.st.map(badge).join('')}</div>${x.fl?x.fl.map(f=>`<div class="flight">✈️ ${f}</div>`).join(''):''}
   <ul>${x.li.map(l=>`<li>${l}</li>`).join('')}</ul>
   ${x.n?`<div class="note" style="margin-top:6px">${x.n}</div>`:''}
   <div class="note" style="margin-top:6px">${links}</div></div></div>`;
