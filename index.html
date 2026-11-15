@@ -28,6 +28,10 @@ nav.tabs .in{max-width:960px;margin:0 auto;display:flex;overflow-x:auto}
 nav.tabs a{flex:1;min-width:84px;text-align:center;color:#B9C7DA;padding:13px 10px;font-weight:600;white-space:nowrap;border-bottom:3px solid transparent}
 nav.tabs a.on{color:#fff;border-color:#7FB3FF}nav.tabs a:hover{text-decoration:none;color:#fff}
 main{max-width:960px;margin:0 auto;padding:0 16px 40px}
+main section{display:none}main section.on{display:block}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mute);margin:0 0 8px}
+.legend i{display:inline-block;width:22px;height:0;border-top:4px solid;vertical-align:middle;margin-right:5px}
+select.chip{padding:5px 10px}
 section{padding-top:22px;scroll-margin-top:56px}
 h2{font-size:21px;margin:0 0 4px}.sub{color:var(--mute);margin:0 0 14px;font-size:13px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
@@ -76,6 +80,7 @@ footer{max-width:960px;margin:0 auto;padding:10px 20px 40px;color:var(--mute);fo
 <section id="map-sec">
   <p class="sub" style="margin-bottom:8px">點標記可開啟 Google 地圖；位置為概略標點。</p>
   <div class="chips" id="regionChips"></div>
+  <div class="legend"><span><i style="border-color:#8E44AD;border-top-style:dashed"></i>飛機</span><span><i style="border-color:#2B6CB0"></i>鐵路</span><span><i style="border-color:#E67E22;border-top-style:dotted"></i>巴士</span><span><i style="border-color:#888;border-top-style:dashed"></i>選配／未定</span></div>
   <div id="map"></div>
   <p class="sum" style="margin-top:14px">16 天。12/22–12/29 札幌段為個人行程（札幌／手稻／Kiroro）；12/31 起與朋友轉往越後湯澤，1/1 教練課、1/2 石打丸山日夜滑，最後回東京返台。</p>
   <div class="facts">
@@ -150,6 +155,9 @@ const PLACES={
  oms:{n:'大宮站',q:'大宮駅',ll:[35.9063,139.6238],r:'tk'},
  yuz:{n:'越後湯澤',q:'越後湯沢駅',ll:[36.9368,138.8087],r:'nj'},
  ish:{n:'石打丸山滑雪場',q:'石打丸山スキー場',ll:[36.9806,138.8272],r:'nj'},
+ cts:{n:'新千歲機場',q:'新千歳空港',ll:[42.7752,141.6923],r:'hk'},
+ hnd:{n:'羽田機場',q:'羽田空港 第2ターミナル',ll:[35.5494,139.7798],r:'tk'},
+ nrt:{n:'成田機場',q:'成田空港 第2ターミナル',ll:[35.7720,140.3929],r:'tk'},
  kar:{n:'輕井澤王子（選配）',q:'軽井沢プリンスホテルスキー場',ll:[36.3417,138.6342],r:'nr'}
 };
 const REG={all:'全部',hk:'北海道',tk:'東京',nj:'新潟',nr:'長野（備案）'};
@@ -273,29 +281,65 @@ $('#exp').onclick=()=>{const d=JSON.stringify({ck:store.get('jst_ck',{}),paid:st
 $('#imp').onclick=()=>{const i=document.createElement('input');i.type='file';i.accept='.json';i.onchange=()=>{const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);store.set('jst_ck',o.ck||{});store.set('jst_paid',o.paid||{});renderCk();renderSplit()}catch(e){alert('備份檔格式不正確')}};r.readAsText(i.files[0])};i.click()};
 $('#rst').onclick=()=>{if(confirm('確定清除此裝置上的勾選紀錄？')){store.set('jst_ck',{});store.set('jst_paid',{});renderCk();renderSplit()}};
 
-/* 地圖 */
+/* 路線 */
+const LEGS=[
+ ['cts','sap','rail','JR 快速 Airport',['12/22','12/29']],
+ ['sap','kok','bus','巴士＋雪票套票',['12/24']],
+ ['sap','tei','rail','JR／巴士',['12/25','12/26']],
+ ['sap','ota','rail','JR 札幌→小樽',['12/27']],
+ ['sap','kir','bus','Access 巴士',['12/28']],
+ ['cts','hnd','air','國內線 11:30 → 13:10',['12/29']],
+ ['hnd','tok','rail','前往赤羽',['12/29']],
+ ['tok','oms','rail','JR 前往大宮',['12/31','1/3','1/5']],
+ ['oms','yuz','rail','上越新幹線',['12/31','1/3']],
+ ['yuz','ish','bus','接駁／巴士（夜滑回程待確認）',['1/2']],
+ ['oms','kar','opt','北陸新幹線（選配，未決定）',['1/5']],
+ ['tok','nrt','rail','前往成田',['1/6']]
+];
+const TYPE={air:{c:'#8E44AD',d:'8 8'},rail:{c:'#2B6CB0',d:null},bus:{c:'#E67E22',d:'2 8'},opt:{c:'#888888',d:'4 8'}};
 let map,layer;
 function initMap(){
  if(!window.L){$('#map').innerHTML='<div class="card">地圖載入失敗，請確認網路連線後重新整理。</div>';return}
  map=L.map('map',{scrollWheelZoom:false}).setView([38.5,139.5],5);
  L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png',{attribution:'地図: 国土地理院',maxZoom:18}).addTo(map);
- layer=L.layerGroup().addTo(map);drawMap('all');
+ layer=L.layerGroup().addTo(map);drawMap('all','');
 }
-function drawMap(r){
- if(!map)return;layer.clearLayers();const pts=[];
- Object.values(PLACES).forEach(p=>{if(r!=='all'&&p.r!==r)return;
-  const days=DAYS.filter(d=>d.p.includes(Object.keys(PLACES).find(k=>PLACES[k]===p))).map(d=>d.d).join('、');
+function drawMap(mode,val){
+ if(!map)return;layer.clearLayers();
+ let legs,keys;
+ if(mode==='day'){
+  legs=LEGS.filter(l=>l[4].includes(val));
+  const d=DAYS.find(x=>x.d===val);keys=new Set(d?d.p:[]);legs.forEach(l=>{keys.add(l[0]);keys.add(l[1])});
+ }else if(mode==='region'){
+  keys=new Set(Object.keys(PLACES).filter(k=>PLACES[k].r===val));legs=LEGS.filter(l=>keys.has(l[0])&&keys.has(l[1]));
+ }else{keys=new Set(Object.keys(PLACES));legs=LEGS}
+ legs.forEach(l=>{const t=TYPE[l[2]];
+  L.polyline([PLACES[l[0]].ll,PLACES[l[1]].ll],{color:t.c,weight:4,opacity:.85,dashArray:t.d}).addTo(layer)
+   .bindTooltip(`${PLACES[l[0]].n} → ${PLACES[l[1]].n}<br>${l[3]}<br>${l[4].join('、')}`,{sticky:true})});
+ const pts=[];
+ keys.forEach(k=>{const p=PLACES[k];
+  const days=[...new Set([...DAYS.filter(d=>d.p.includes(k)).map(d=>d.d),...LEGS.filter(l=>l[0]===k||l[1]===k).flatMap(l=>l[4])])].join('、');
   L.marker(p.ll).addTo(layer).bindPopup(`<b>${p.n}</b><br>${days}<br><a href="${gm(p.q)}" target="_blank" rel="noopener">在 Google 地圖開啟</a>`);pts.push(p.ll)});
  if(pts.length>1)map.fitBounds(pts,{padding:[40,40],maxZoom:10});else if(pts.length)map.setView(pts[0],10);
 }
-$('#regionChips').innerHTML=Object.entries(REG).map(([k,v],i)=>`<button class="chip${i?'':' on'}" data-r="${k}">${v}</button>`).join('');
-$('#regionChips').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));b.classList.add('on');drawMap(b.dataset.r)};
+const REGN={hk:'北海道',tk:'東京',nj:'新潟',nr:'長野（備案）'};
+$('#regionChips').innerHTML='<button class="chip on" data-m="all">全程</button>'+Object.entries(REGN).map(([k,v])=>`<button class="chip" data-m="region" data-v="${k}">${v}</button>`).join('')+
+ '<select class="chip" id="daySel"><option value="">依日期…</option>'+DAYS.map(d=>`<option value="${d.d}">${d.d}（${d.w}）${d.t}</option>`).join('')+'</select>';
+$('#regionChips').onclick=e=>{const b=e.target.closest('button.chip');if(!b)return;
+ document.querySelectorAll('#regionChips .chip').forEach(c=>c.classList.remove('on'));b.classList.add('on');$('#daySel').value='';drawMap(b.dataset.m,b.dataset.v)};
+$('#daySel').onchange=e=>{document.querySelectorAll('#regionChips .chip').forEach(c=>c.classList.remove('on'));if(e.target.value){e.target.classList.add('on');drawMap('day',e.target.value)}else{document.querySelector('#regionChips button').classList.add('on');drawMap('all','')}};
 
-/* 導覽高亮 */
+/* 分頁 */
+const TABS=['map-sec','days','tickets','split','prep'];
 const secs=[...document.querySelectorAll('main section')],links=[...document.querySelectorAll('nav.tabs a')];
-addEventListener('scroll',()=>{let cur=0;secs.forEach((s,i)=>{if(s.getBoundingClientRect().top<120)cur=i});links.forEach((a,i)=>a.classList.toggle('on',i===cur))},{passive:true});
+function show(id){if(!TABS.includes(id))id='map-sec';
+ secs.forEach(x=>x.classList.toggle('on',x.id===id));links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+id));
+ try{history.replaceState(null,'','#'+id)}catch(e){}
+ if(id==='map-sec'&&map)setTimeout(()=>map.invalidateSize(),50);window.scrollTo(0,0)}
+links.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();show(a.getAttribute('href').slice(1))}));
 
 renderDays();renderTickets();renderSplit();renderCk();
+show(location.hash.slice(1));
 window.addEventListener('load',initMap);
 </script>
 </body>
