@@ -300,7 +300,7 @@ const TYPE={air:{c:'#8E44AD',d:'8 8'},rail:{c:'#2B6CB0',d:null},bus:{c:'#E67E22'
 let map,layer;
 function initMap(){
  if(!window.L){$('#map').innerHTML='<div class="card">地圖載入失敗，請確認網路連線後重新整理。</div>';return}
- map=L.map('map',{scrollWheelZoom:false}).setView([38.5,139.5],5);
+ map=L.map('map',{scrollWheelZoom:true,wheelPxPerZoomLevel:90,zoomSnap:0.5}).setView([38.5,139.5],5);
  L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png',{attribution:'地図: 国土地理院',maxZoom:18}).addTo(map);
  layer=L.layerGroup().addTo(map);drawMap('all','');
 }
