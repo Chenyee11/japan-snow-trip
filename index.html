@@ -56,6 +56,9 @@ h2{font-size:21px;margin:0 0 4px}.sub{color:var(--mute);margin:0 0 14px;font-siz
 .dchip.on{background:var(--navy);border-color:var(--navy);color:#fff}.dchip.on span{color:#B9C7DA}
 .daynav{display:flex;justify-content:space-between;gap:8px;margin-top:12px}
 .daynav .btn:disabled{opacity:.4;cursor:default}
+.guide{background:#F2F8F4;border:1px solid #CFE6D8;border-radius:10px;padding:8px 12px;margin-top:10px}
+.guide summary{cursor:pointer;font-weight:700;color:var(--ok)}
+.guide ol{margin:8px 0 6px;padding-left:20px}.guide li{margin:4px 0}
 .tbl{width:100%;border-collapse:collapse;font-size:14px}
 .tbl th,.tbl td{padding:8px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
 .tbl th{font-size:12px;color:var(--mute);font-weight:600}.num{text-align:right;white-space:nowrap}
@@ -173,7 +176,7 @@ const REG={all:'全部',hk:'北海道',tk:'東京',nj:'新潟',nr:'長野（備�
 
 /* 每日 */
 const DAYS=[
- {d:'12/22',w:'二',ph:'第一階段｜北海道（個人行程）',t:'台灣 → 札幌',st:['ok'],p:['cts','sap'],fl:['桃園 T1 09:15 起飛 → 新千歲 14:05 抵達（日本時間，比台灣快 1 小時）','機型：空中巴士 A350-1000｜飛行約 3 小時 50 分'],li:['建議 06:30 前抵達桃園 T1（雪板托運）','預估 15:00–15:30 出關（領雪板特殊行李可能較慢）','順路逛蠟筆小新快閃店「Cinema Parade Tour」（新千歲機場連絡施設 2F，9:00–18:00，營業至 2027/6/30），預估逗留 30–45 分鐘','再搭 JR 快速 Airport 約 40 分鐘進札幌，預估 17:30–18:00 入住 JR 札幌站附近飯店'],n:'交通已訂；以上為預估時間，請以實際入境與班次為準'},
+ {d:'12/22',guide:{"t": "新千歲機場 → 札幌站（JR）怎麼搭", "steps": ["出關、領完行李後，沿連絡通道走到國內線航廈（蠟筆小新快閃店就在這條連絡通道的 2F，想逛可以順路）", "往地下 1 樓找「JR 新千歲空港站」，車站與航廈直通，不用走到室外", "在自動售票機買「新千歲空港 → 札幌」車票（JR 北海道官網標示 ¥1,230，票價以現場為準），也可到窗口；車站有 JR 服務櫃台和外國旅客櫃台，可用英文或中文詢問", "進站：只有一個剪票口、一個月台，不容易走錯", "搭「快速 Airport（快速エアポート）」往札幌方向。白天（9 到 16 時）每小時約 6 班，最快 37 分鐘；上車前看電子看板確認目的地", "在「札幌」站下車。約 30 分鐘後會先經過「新札幌」，不要在那裡下，繼續坐到札幌，札幌是大站，大多數人都在這裡下車", "出站走去飯店。雪板袋和大行李很重，盡量找電梯，不要提著走樓梯"], "note": "到札幌站約 17:30 前後可能碰到下班人潮，大型行李要自己搬運，盡量不要擠在車門口。末班車約 23:21 從新千歲出發，你的抵達時間遠早於末班。備案：機場巴士約 70 分鐘；計程車定額約 ¥12,900，不建議。"},w:'二',ph:'第一階段｜北海道（個人行程）',t:'台灣 → 札幌',st:['ok'],p:['cts','sap'],fl:['桃園 T1 09:15 起飛 → 新千歲 14:05 抵達（日本時間，比台灣快 1 小時）','機型：空中巴士 A350-1000｜飛行約 3 小時 50 分'],li:['建議 06:30 前抵達桃園 T1（雪板托運）','預估 15:00–15:30 出關（領雪板特殊行李可能較慢）','順路逛蠟筆小新快閃店「Cinema Parade Tour」（新千歲機場連絡施設 2F，9:00–18:00，營業至 2027/6/30），預估逗留 30–45 分鐘','再搭 JR 快速 Airport 約 40 分鐘進札幌，預估 17:30–18:00 入住 JR 札幌站附近飯店'],n:'交通已訂；以上為預估時間，請以實際入境與班次為準'},
  {d:'12/23',w:'三',t:'札幌：雪具店與市區',st:['tmp'],p:['sap'],li:['雪具店確認安全帽、護具、上蠟','大通、狸小路等市區觀光'],n:'市區細節可彈性調整'},
  {d:'12/24',w:'四',t:'札幌國際滑雪場：全天自由滑',st:['no'],p:['kok'],hl:1,li:['計畫搭巴士＋雪票套票（約 ¥9,500）'],n:'雪票與接駁未購；需核對日期、上下車點與空位'},
  {d:'12/25',w:'五',t:'手稻 Olympia：私人課',st:['ok','no'],p:['tei'],hl:1,li:['09:00「雪長姐」單人全天私人課（NT$16,000 已付）','建議 08:15–08:30 抵達；需確認教練集合點','雪票與早班交通未購（考慮 JR 到手稻站再轉計程車）'],n:'Big Runs 約 09:25 才到，趕不上 09:00 課程'},
@@ -263,6 +266,7 @@ function dayCard(x){
  return `<div class="day${x.hl?' hl':''}"><div class="dd"><b>${x.d}</b><span>週${x.w}</span></div>
  <div class="card"><h3>${x.t}</h3><div>${x.st.map(badge).join('')}</div>${x.fl?x.fl.map(f=>`<div class="flight">✈️ ${f}</div>`).join(''):''}${x.todo?x.todo.map(t=>`<div class="todo">📌 向湯澤住宿確認：${t}</div>`).join(''):''}
  <ul>${x.li.map(l=>`<li>${l}</li>`).join('')}</ul>
+ ${x.guide?`<details class="guide" open><summary>🚆 ${x.guide.t}</summary><ol>${x.guide.steps.map(t=>`<li>${t}</li>`).join('')}</ol><div class="note">${x.guide.note}</div></details>`:''}
  ${x.n?`<div class="note" style="margin-top:6px">${x.n}</div>`:''}
  <div class="note" style="margin-top:6px">${links}</div></div></div>`;
 }
