@@ -50,6 +50,12 @@ h2{font-size:21px;margin:0 0 4px}.sub{color:var(--mute);margin:0 0 14px;font-siz
 .day.hl .dd{background:var(--blue)}
 .flight{background:#EEF4FB;border-left:3px solid var(--blue);border-radius:6px;padding:5px 10px;margin:8px 0 2px;font-size:14px;font-weight:600}
 .todo{background:#FFF4E5;border-left:3px solid var(--warn);border-radius:6px;padding:5px 10px;margin:8px 0 2px;font-size:13px}
+.daybar{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;margin-bottom:4px}
+.dchip{flex:none;min-width:58px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:6px 8px;cursor:pointer;text-align:center;color:var(--ink);font:inherit}
+.dchip b{display:block;font-size:15px;line-height:1.2}.dchip span{font-size:11px;color:var(--mute)}
+.dchip.on{background:var(--navy);border-color:var(--navy);color:#fff}.dchip.on span{color:#B9C7DA}
+.daynav{display:flex;justify-content:space-between;gap:8px;margin-top:12px}
+.daynav .btn:disabled{opacity:.4;cursor:default}
 .tbl{width:100%;border-collapse:collapse;font-size:14px}
 .tbl th,.tbl td{padding:8px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
 .tbl th{font-size:12px;color:var(--mute);font-weight:600}.num{text-align:right;white-space:nowrap}
@@ -248,18 +254,28 @@ const CK=[
 ];
 
 /* ---------- render ---------- */
+let curDay=0;
+(function(){const n=new Date();const mo=n.getMonth()+1,dd=n.getDate(),y=n.getFullYear();
+ const i=DAYS.findIndex(x=>{const[a,b]=x.d.split('/').map(Number);return a===mo&&b===dd&&((a===12&&y===2026)||(a===1&&y===2027))});if(i>=0)curDay=i})();
+function phaseOf(i){for(let k=i;k>=0;k--)if(DAYS[k].ph)return DAYS[k].ph;return''}
+function dayCard(x){
+ const links=x.p.map(k=>`<a href="${gm(PLACES[k].q)}" target="_blank" rel="noopener">📍${PLACES[k].n}</a>`).join('　');
+ return `<div class="day${x.hl?' hl':''}"><div class="dd"><b>${x.d}</b><span>週${x.w}</span></div>
+ <div class="card"><h3>${x.t}</h3><div>${x.st.map(badge).join('')}</div>${x.fl?x.fl.map(f=>`<div class="flight">✈️ ${f}</div>`).join(''):''}${x.todo?x.todo.map(t=>`<div class="todo">📌 向湯澤住宿確認：${t}</div>`).join(''):''}
+ <ul>${x.li.map(l=>`<li>${l}</li>`).join('')}</ul>
+ ${x.n?`<div class="note" style="margin-top:6px">${x.n}</div>`:''}
+ <div class="note" style="margin-top:6px">${links}</div></div></div>`;
+}
 function renderDays(){
- let h='';
- DAYS.forEach(x=>{
-  if(x.ph)h+=`<div class="phase">${x.ph}</div>`;
-  const links=x.p.map(k=>`<a href="${gm(PLACES[k].q)}" target="_blank" rel="noopener">📍${PLACES[k].n}</a>`).join('　');
-  h+=`<div class="day${x.hl?' hl':''}"><div class="dd"><b>${x.d}</b><span>週${x.w}</span></div>
-  <div class="card"><h3>${x.t}</h3><div>${x.st.map(badge).join('')}</div>${x.fl?x.fl.map(f=>`<div class="flight">✈️ ${f}</div>`).join(''):''}${x.todo?x.todo.map(t=>`<div class="todo">📌 向湯澤住宿確認：${t}</div>`).join(''):''}
-  <ul>${x.li.map(l=>`<li>${l}</li>`).join('')}</ul>
-  ${x.n?`<div class="note" style="margin-top:6px">${x.n}</div>`:''}
-  <div class="note" style="margin-top:6px">${links}</div></div></div>`;
- });
- $('#dayList').innerHTML=h;
+ const bar=DAYS.map((x,i)=>`<button class="dchip${i===curDay?' on':''}" data-i="${i}"><b>${x.d}</b><span>週${x.w}</span></button>`).join('');
+ const ph=phaseOf(curDay);
+ $('#dayList').innerHTML=`<div class="daybar">${bar}</div><div class="phase">第 ${curDay+1} 天／共 ${DAYS.length} 天${ph?'｜'+ph:''}</div>${dayCard(DAYS[curDay])}
+ <div class="daynav"><button class="btn" id="prevD"${curDay===0?' disabled':''}>← 前一天</button><button class="btn" id="mapD">在地圖看這天</button><button class="btn" id="nextD"${curDay===DAYS.length-1?' disabled':''}>下一天 →</button></div>`;
+ $('#dayList').querySelectorAll('.dchip').forEach(b=>b.onclick=()=>{curDay=+b.dataset.i;renderDays()});
+ $('#prevD').onclick=()=>{if(curDay>0){curDay--;renderDays()}};
+ $('#nextD').onclick=()=>{if(curDay<DAYS.length-1){curDay++;renderDays()}};
+ $('#mapD').onclick=()=>{show('map-sec');const sel=$('#daySel');if(sel){document.querySelectorAll('#regionChips .chip').forEach(c=>c.classList.remove('on'));sel.value=DAYS[curDay].d;sel.classList.add('on');drawMap('day',DAYS[curDay].d)}};
+ const on=$('#dayList').querySelector('.dchip.on');if(on&&on.scrollIntoView)try{on.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}
 }
 function renderTickets(){
  $('#ticketTbl').innerHTML='<tr><th>日期</th><th>方案</th><th>費用</th><th>狀態</th><th>備註</th></tr>'+TK.map(r=>`<tr><td>${r[0]}</td><td>${r[4]?`<a href="${r[4]}" target="_blank" rel="noopener">${r[1]}</a>`:r[1]}</td><td class="num">${r[2]}</td><td>${badge(r[3])}</td><td style="font-size:13px;color:var(--mute)">${r[5]}</td></tr>`).join('');
